@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>水墨仙侠 · 江湖卷</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "楷体", "KaiTi", serif;
+            background: #0a0a0a;
+            overflow-x: hidden;
+            cursor: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSByPSI2IiBjeD0iOCIgY3k9IjgiIGZpbGw9IiNkNGMxYjUiLz48L3N2Zz4="), auto;
+        }
+
+        .scroll-container {
+            width: 100vw;
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .section {
+            width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .section-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            filter: grayscale(20%) brightness(0.85) contrast(1.1);
+        }
+
+        .text-mask {
+            position: absolute;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+        }
+
+        .narration {
+            position: relative;
+            z-index: 3;
+            color: #d4c1a5;
+            text-align: center;
+            max-width: 800px;
+            padding: 2rem;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+            opacity: 0;
+            transform: translateY(50px);
+            animation: fadeIn 1.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .narration h2 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 8px;
+            color: #e6d7b9;
+            font-weight: 500;
+        }
+
+        .narration p {
+            font-size: 1.5rem;
+            line-height: 2.2;
+            letter-spacing: 3px;
+        }
+
+        .decoration {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            color: #d4c1a5;
+            font-size: 1.2rem;
+            letter-spacing: 5px;
+            opacity: 0.7;
+        }
+
+        .music-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #d4c1a5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d4c1a5;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .music-control:hover {
+            background: rgba(212, 193, 165, 0.2);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(212, 193, 165, 0.5);
+        }
+
+        .music-control::before {
+            content: '\1F3A7';
+            font-size: 24px;
+        }
+
+        .music-control.muted::before {
+            content: '\1F50A';
+        }
+
+        /* 视频样式 */
+        .video-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-box {
+            width: 80%;
+            max-width: 1000px;
+            border: 2px solid #d4c1a5;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .video-box video {
+            width: 100%;
+            display: block;
+        }
+
+        .close-video {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            width: 44px;
+            height: 44px;
+            line-height: 44px;
+            text-align: center;
+            color: #d4c1a5;
+            font-size: 26px;
+            border: 2px solid #d4c1a5;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            cursor: pointer;
+            z-index: 100000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="decoration">水墨仙侠 · 江湖长卷</div>
+
+    <audio id="bgMusic" loop volume="0.3" autoplay>
+        <source src="知我 - 国风堂、哦漏.mp3" type="audio/mp3">
+    </audio>
+
+    <div id="musicBtn" class="music-control"></div>
+
+    <div class="scroll-container">
+
+        <!-- ========== 第1页 ========== -->
+        <section class="section">
+            <div class="text-mask"></div>
+            <img src="q3.png" class="section-bg">
+            <div class="narration">
+                <h2>山门</h2>
+                <p>云深不知处，山门隐雾中。<br>一剑破尘俗，从此入仙踪。</p>
+            </div>
+            <!-- 第1页独立视频 -->
+            <div class="video-modal">
+                <div class="close-video">×</div>
+                <div class="video-box">
+                    <video controls>
+                        <source src="k4.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 第2页 ========== -->
+        <section class="section">
+            <div class="text-mask"></div>
+            <img src="q5.png" class="section-bg">
+            <div class="narration">
+                <h2>长歌行</h2>
+                <p>鼓腕腾棍晴雷收，舞腰困褭垂杨柔。
+                    <br>象箸击折歌勿休，玉山未到非风流。
+                </p>
+            </div>
+            <!-- 第2页独立视频 -->
+            <div class="video-modal">
+                <div class="close-video">×</div>
+                <div class="video-box">
+                    <video controls>
+                        <source src="k2.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 第3页 ========== -->
+        <section class="section">
+            <div class="text-mask"></div>
+            <img src="q6.png" class="section-bg">
+            <div class="narration">
+                <h2>问道</h2>
+                <p>竹林听风语，静心悟真禅。<br>红尘皆过客，唯道留人间。</p>
+            </div>
+            <!-- 第3页独立视频 -->
+            <div class="video-modal">
+                <div class="close-video">×</div>
+                <div class="video-box">
+                    <video controls>
+                        <source src="kf.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 第4页 ========== -->
+        <section class="section">
+            <div class="text-mask"></div>
+            <img src="q8.png" class="section-bg">
+            <div class="narration">
+                <h2>侠客</h2>
+                <p>仗剑走天涯，快意斩恩仇。<br>江湖一杯酒，天地皆朋友。</p>
+            </div>
+            <!-- 第4页独立视频 -->
+            <div class="video-modal">
+                <div class="close-video">×</div>
+                <div class="video-box">
+                    <video controls>
+                        <source src="k3.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 第5页 ========== -->
+        <section class="section">
+            <div class="text-mask"></div>
+            <img src="q7.png" class="section-bg">
+            <div class="narration">
+                <h2>劝学吟</h2>
+                <p>少年辛苦莫辞频，
+                    功到成时自有因。
+                    <br>不信但看岩下竹，
+                    十年根固一朝新。
+                </p>
+            </div>
+            <!-- 第5页独立视频 -->
+            <div class="video-modal">
+                <div class="close-video">×</div>
+                <div class="video-box">
+                    <video controls autoplay>
+                        <source src="k6.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 第6页 ========== -->
+        <section class="section">
+            <div class="text-mask"></div>
+            <img src="q4.png" class="section-bg">
+            <div class="narration">
+                <h2>其一</h2>
+                <p>敛眉藏意久相望，
+                    不敢轻言寸寸肠。
+                    <br>万里风烟皆过客，
+                    唯卿岁岁入诗行。
+                </p>
+            </div>
+            <!-- 第6页独立视频 -->
+            <div class="video-modal">
+                <div class="close-video">×</div>
+                <div class="video-box">
+                    <video controls>
+                        <source src="k5.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 第7页 ========== -->
+        <section class="section">
+            <div class="text-mask"></div>
+            <img src="q2.png" class="section-bg">
+            <div class="narration">
+                <h2>竹石</h2>
+                <p>咬定青山不放松，立根原在破岩中。
+                    <br> 千磨万击还坚劲，任尔东西南北风。
+                </p>
+            </div>
+            <!-- 第7页独立视频 -->
+            <div class="video-modal">
+                <div class="close-video">×</div>
+                <div class="video-box">
+                    <video controls>
+                        <source src="k1.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 第8页 ========== -->
+        <section class="section">
+            <div class="text-mask"></div>
+            <img src="q1.png" class="section-bg">
+            <div class="narration">
+                <h2>春风</h2>
+                <p>东风拂野软无尘，轻染千山草木新。<br>漫逐繁花香满路，
+                    悄携暖意入人间。</p>
+            </div>
+            <!-- 第8页独立视频 -->
+            <div class="video-modal">
+                <div class="close-video">×</div>
+                <div class="video-box">
+                    <video controls>
+                        <source src="k.mp4" type="video/mp4">
+                    </video>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // 文字动画
+        const sections = document.querySelectorAll('.section');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                const t = entry.target.querySelector('.narration');
+                entry.isIntersecting
+                    ? (t.style.animation = 'fadeIn 1.5s forwards')
+                    : (t.style.animation = 'none', t.style.opacity = 0, t.style.transform = 'translateY(50px)');
+            });
+        }, { threshold: 0.7 });
+        sections.forEach(s => observer.observe(s));
+
+        // 音乐
+        const bgMusic = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        musicBtn.addEventListener('click', () => {
+           
+                if (bgMusic.paused) {
+                    bgMusic.play().then(() => musicBtn.classList.remove('muted'));
+                } else {
+                    bgMusic.pause();
+                    musicBtn.classList.add('muted');
+                }
+            });
+
+            // ========== 视频：100% 独立逻辑 ==========
+            // 关闭所有视频
+            function closeAllVideos() {
+                document.querySelectorAll('.video-modal').forEach(v => {
+                    v.style.display = 'none';
+                    const video = v.querySelector('video');
+                    if (video) video.pause();
+                });
+            }
+
+            // 点击页面 → 打开当前页视频
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.onclick = () => {
+                    closeAllVideos();
+                    const currentVideo = sec.querySelector('.video-modal');
+                    currentVideo.style.display = 'flex';
+                    const video = currentVideo.querySelector('video');
+                    if (video) video.play();
+                };
+            });
+
+            // 关闭按钮
+            document.querySelectorAll('.close-video').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const modal = btn.closest('.video-modal');
+                    modal.style.display = 'none';
+                    modal.querySelector('video').pause();
+                };
+            });
+    </script>
+</body>
+
+</html>
